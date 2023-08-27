@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Client</title>
+</head>
+<body>
+    <h1>WebSocket Client</h1>
+    <div>
+        <button id="connectButton">Connect</button>
+        <input type="text" id="messageInput" placeholder="Enter a message">
+        <button id="sendButton" disabled>Send</button>
+    </div>
+    <div id="messages"></div>
+
+    <script>
+        const connectButton = document.getElementById("connectButton");
+        const messageInput = document.getElementById("messageInput");
+        const sendButton = document.getElementById("sendButton");
+        const messagesDiv = document.getElementById("messages");
+
+        let socket;
+
+        connectButton.addEventListener("click", function () {
+            socket = new WebSocket("ws://localhost:8080/ws");
+
+            socket.onopen = function (event) {
+                console.log("WebSocket opened");
+                connectButton.disabled = true;
+                sendButton.disabled = false;
+            };
+
+            socket.onmessage = function (event) {
+                const message = event.data;
+                const messageElement = document.createElement("div");
+                messageElement.innerText = "Received: " + message;
+                messagesDiv.appendChild(messageElement);
+            };
+
+            socket.onclose = function (event) {
+                console.log("WebSocket closed");
+                connectButton.disabled = false;
+                sendButton.disabled = true;
+            };
+        });
+
+        sendButton.addEventListener("click", function () {
+            const message = messageInput.value;
+            socket.send(message);
+            messageInput.value = "";
+        });
+    </script>
+</body>
+</html>
+
